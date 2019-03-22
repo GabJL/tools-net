@@ -5,17 +5,17 @@ from utils import maclib
 
 def print_report(mac):
     print(f"Complete MAC: {mac}")
-    print("\tVendor:")
-    print(f"\t\tID: {mac.get_vendor_id()}")
+    print("Vendor:")
+    print(f"\tID: {mac.get_vendor_id()}")
     vendor = mac.get_vendor_name()
     if vendor is not None:
-        print(f"\t\tName: {vendor}")
-    print(f"\tSerial Number: {mac.get_serial_number()}")
+        print(f"\tName: {vendor}")
+    print(f"Serial Number: {mac.get_serial_number()}")
     if mac.is_local():
-        print("\tThis address is locally administered")
+        print("This address is locally administered")
     else:
-        print("\tThis address is global")
-    print("\tThis address is ",end="")
+        print("This address is global")
+    print("This address is ",end="")
     if mac.is_unicast():
         print("unicast")
     elif mac.is_broadcast():
