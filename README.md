@@ -51,8 +51,8 @@ Un ejemplo de funcionamiento:
 
 ```console
 user@Gcomputer:~/path-tools-net$ python3 -m tools.net-interfaces
-lo: 00:00:00:00:00:00 - (global)- up
-wlp2s0: a4:c5:cd:e1:cd:9d - (global)- up
+lo: 00:00:00:00:00:00 - (global) - up
+wlp2s0: a4:c5:cd:e1:cd:9d - (global) - up
 ```
 
 ## Módulos interesantes

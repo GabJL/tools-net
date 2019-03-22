@@ -20,7 +20,7 @@ def print_info(nic, mac, up):
         print("local", end="")
     else:
         print("global", end="")
-    print(f")- {up}")
+    print(f") - {up}")
 
 
 def get_ifaces_with_netifaces():
