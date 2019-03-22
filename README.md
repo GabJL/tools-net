@@ -7,7 +7,12 @@ En este repositorio voy a incluir algunas herramientas básicas que cubren algun
 * [Herramientas](#herramientas)
     * [MAC Analyzer](#mac-analyzer)
     * [Network Interfaces](#network-interfaces)
+* [Otros](#otros)
+    * Parseo de resúmenes generados con tshark
+    * Parseo de ficheros pcapng con pyshark
+    * Parseo de ficheros pcapng con scapy
 * [Módulos interesantes](#mdulos-interesantes)
+* [Anexo: Uso de tshark básico](#anexo-uso-bsico-de-tshark)
 
 ## Requisitos e instalación
 
@@ -55,8 +60,16 @@ lo: 00:00:00:00:00:00 - (global) - up
 wlp2s0: a4:c5:cd:e1:cd:9d - (global) - up
 ```
 
+## Otros
+
+Ejemplos de uso de python para otros usos relacionados con la red.
+
 ## Módulos interesantes
 
-* [netifaces](https://alastairs-place.net/projects/netifaces/): Nos permite consultar los interfaces de red disponibles en el equipo.
-* [psutil](https://psutil.readthedocs.io/en/latest/): Ofrece información de los procesos y del sistema (incluyendo información de red).
 * [ipaddress](https://docs.python.org/3/howto/ipaddress.html): Módulo para el manejo de direcciones IP y redes.
+* [psutil](https://psutil.readthedocs.io/en/latest/): Ofrece información de los procesos y del sistema (incluyendo información de red).
+* [pyshark](https://kiminewt.github.io/pyshark/): Wrapper para utilizar **tshark** desde python (tanto la captura como el análisis de ficheros pcapng).
+* [netifaces](https://alastairs-place.net/projects/netifaces/): Nos permite consultar los interfaces de red disponibles en el equipo.
+
+
+## Anexo: Uso básico de tshark
