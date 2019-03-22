@@ -8,7 +8,7 @@ En este repositorio voy a incluir algunas herramientas básicas que cubren algun
     * [MAC Analyzer](#mac-analyzer)
     * [Network Interfaces](#network-interfaces)
 * [Otros](#otros)
-    * Parseo de resúmenes generados con tshark
+    * [Parseo de resúmenes generados con tshark](#anlisis-de-la-salida-de-tshark)
     * Parseo de ficheros pcapng con pyshark
     * Parseo de ficheros pcapng con scapy
 * [Módulos interesantes](#mdulos-interesantes)
