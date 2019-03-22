@@ -28,7 +28,7 @@ class MACAddress():
         url = "https://macvendors.co/api/vendorname/"+self.get_vendor_id()
         response = requests.get(url)
         if response.status_code != 200:
-            return "Unknown"
+            return None
         else:
             return response.text
 
