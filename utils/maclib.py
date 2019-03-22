@@ -22,7 +22,9 @@ class MACAddress():
         return self.mac
 
     def get_vendor_id(self):
-        return self.mac[:len(self.mac)//2]
+        vendor = self.mac[:len(self.mac)//2]
+        vendor = vendor[0] + hex(int(vendor[1],16) & 0xc)[-1] + vendor[2:]
+        return vendor
 
     def get_vendor_name(self):
         url = "https://macvendors.co/api/vendorname/"+self.get_vendor_id()
@@ -36,13 +38,13 @@ class MACAddress():
         return self.mac[len(self.mac)//2 + 1:]
 
     def is_local(self):
-        return hex(self.mac[1]) & 0x2
+        return int(self.mac[1], 16) & 0x2
 
     def is_global(self):
         return not self.is_local()
 
     def is_multicast(self):
-        return hex(self.mac[1]) & 0x1
+        return int(self.mac[1], 16) & 0x1
 
     def is_unicast(self):
         return not self.is_multicast()
