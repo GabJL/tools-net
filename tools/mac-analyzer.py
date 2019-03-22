@@ -6,10 +6,10 @@ from utils import maclib
 def print_report(mac):
     print(f"Complete MAC: {mac}")
     print("Vendor:")
-    print(f"\tID: {mac.get_vendor_id()}")
+    print(f"    ID: {mac.get_vendor_id()}")
     vendor = mac.get_vendor_name()
     if vendor is not None:
-        print(f"\tName: {vendor}")
+        print(f"    Name: {vendor}")
     print(f"Serial Number: {mac.get_serial_number()}")
     if mac.is_local():
         print("This address is locally administered")

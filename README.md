@@ -20,9 +20,9 @@ Un ejemplo de funcionamiento:
 user@computer:~/path-tools-net$ python3 -m tools.mac-analyzer 03:11:22:33:44:55
 Complete MAC: 03:11:22:33:44:55
 Vendor:
-        ID: 00:11:22
-        Name: CIMSYS Inc
- Serial Number: 33:44:55
- This address is locally administered
- This address is multicast
+    ID: 00:11:22
+    Name: CIMSYS Inc
+Serial Number: 33:44:55
+This address is locally administered
+This address is multicast
 ```
