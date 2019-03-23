@@ -7,6 +7,7 @@ En este repositorio voy a incluir algunas herramientas básicas que cubren algun
 * [Herramientas](#herramientas)
     * [MAC Analyzer](#mac-analyzer)
     * [Network Interfaces](#network-interfaces)
+    * [IP Class]{#ip-class}
 * [Otros](#otros)
     * [Parseo de resúmenes generados con tshark](#anlisis-de-la-salida-de-tshark)
     * Parseo de ficheros pcapng con pyshark
@@ -58,6 +59,17 @@ Un ejemplo de funcionamiento:
 user@Gcomputer:~/path-tools-net$ python3 -m tools.net-interfaces
 lo: 00:00:00:00:00:00 - (global) - up
 wlp2s0: a4:c5:cd:e1:cd:9d - (global) - up
+```
+
+### IP Class
+
+Este programa recibe como parámetro una IPv4 válida (en formato decimal-punto) y nos indica a qué clase (A a F) pertenece.
+
+Un ejemplo de funcionamientoo
+
+```console
+user@Gcomputer:~/path-tools-net$ python3 -m tools.ip-class 150.214.56.9
+150.214.56.9 is from class B
 ```
 
 ## Otros
