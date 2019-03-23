@@ -12,11 +12,17 @@ class MACAddress():
         self.mac = mac.replace("-",":").replace(".",":").lower()
 
     def __check_mac(self, mac):
-        ''' Explicación de la expresión regular
-            [0-9a-f]{2}: dos dígitos hexadecimal
-            [:-\\.]: separadores validos
-            \1: nos referimos al primer grupo () y forzamos que sea el mismo luego'''
-        return re.search(r"^[0-9a-f]{2}([:-\\.])[0-9a-f]{2}(\1[0-9a-f]{2}){4}$",mac.lower())
+        sep_counter = 0
+        if mac.find(":") > 0:
+            sep_counter += 1
+        if mac.find(".") > 0:
+            sep_counter += 1
+        if mac.find("-") > 0:
+            sep_counter += 1
+        if sep_counter != 1:
+            return False
+        mac = mac.replace("-",":").replace(".",":").lower()
+        return re.search(r"^([0-9a-f]{2}:){5}[0-9a-f]{2}$", mac)
 
     def __str__(self):
         return self.mac

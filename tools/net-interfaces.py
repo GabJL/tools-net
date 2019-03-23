@@ -29,8 +29,11 @@ def get_ifaces_with_netifaces():
     for nic in netifs:
         info = netifaces.ifaddresses(nic).get(netifaces.AF_LINK)
         if info:
-            mac = maclib.MACAddress(info[0]['addr'])
-            print_info(nic, mac, "up")
+            try:
+                mac = maclib.MACAddress(info[0]['addr'])
+                print_info(nic, mac, "up")
+            except maclib.MACAddressException:
+                pass
 
 
 def get_ifaces_with_psutil():
@@ -38,15 +41,17 @@ def get_ifaces_with_psutil():
     for nic, addrs in psutil.net_if_addrs().items():
         for addr in addrs:
             if addr.family == psutil.AF_LINK:
-                mac = maclib.MACAddress(addr.address)
-                up = "up"
-                if nic in stats:
-                    st = stats[nic]
-                    if not st.isup:
-                        up = "down"
-                print_info(nic, mac, up)
-                break
-
+                try:
+                    mac = maclib.MACAddress(addr.address)
+                    up = "up"
+                    if nic in stats:
+                        st = stats[nic]
+                        if not st.isup:
+                            up = "down"
+                    print_info(nic, mac, up)
+                    break
+                except maclib.MACAddressException:
+                    pass
 
 if __name__ == "__main__":
     if option == 1:
@@ -54,5 +59,5 @@ if __name__ == "__main__":
     elif option == 2:
         get_ifaces_with_netifaces()
     else:
-        print("netiface or psutil modules are required")
+        print("netifaces or psutil modules are required")
 

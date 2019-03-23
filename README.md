@@ -95,10 +95,10 @@ user@Gcomputer:path-tools-net$ python3 -m others.tshark-output-analysis others/s
 ## Módulos interesantes
 
 * [ipaddress](https://docs.python.org/3/howto/ipaddress.html): Módulo para el manejo de direcciones IP y redes.
+* [netifaces](https://alastairs-place.net/projects/netifaces/): Nos permite consultar los interfaces de red disponibles en el equipo.
 * [psutil](https://psutil.readthedocs.io/en/latest/): Ofrece información de los procesos y del sistema (incluyendo información de red).
 * [pyshark](https://kiminewt.github.io/pyshark/): Wrapper para utilizar **tshark** desde python (tanto la captura como el análisis de ficheros pcapng).
-* [netifaces](https://alastairs-place.net/projects/netifaces/): Nos permite consultar los interfaces de red disponibles en el equipo.
-
+* [requests](http://docs.python-requests.org/en/master/): Módulo para hacer peticiones HTTP de forma sencilla.
 
 ## Anexo: Uso básico de tshark
 
