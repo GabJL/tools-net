@@ -7,7 +7,7 @@ En este repositorio voy a incluir algunas herramientas básicas que cubren algun
 * [Herramientas](#herramientas)
     * [MAC Analyzer](#mac-analyzer)
     * [Network Interfaces](#network-interfaces)
-    * [IP Class]{#ip-class}
+    * [IP Class](#ip-class)
 * [Otros](#otros)
     * [Parseo de resúmenes generados con tshark](#anlisis-de-la-salida-de-tshark)
     * Parseo de ficheros pcapng con pyshark
