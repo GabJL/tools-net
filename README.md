@@ -19,7 +19,12 @@ En este repositorio voy a incluir algunas herramientas básicas que cubren algun
 
 Requiere Python 3.
 
-Algunas herramientas requieren módulos adicionales.
+Algunas herramientas requieren módulos adicionales. Se ha incluido el fichero *requirements.txt* para facilitar su instalación
+de la siguiente forma:
+
+```console
+user@computer:path-tools-net$ pip3 install -r requirements.txt
+```
 
 No requiere instalación, solo descargue o clone el respositorio para utilizarlo.
 
