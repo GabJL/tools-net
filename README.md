@@ -14,6 +14,7 @@ En este repositorio voy a incluir algunas herramientas básicas que cubren algun
     * Parseo de ficheros pcapng con pyshark
     * Parseo de ficheros pcapng con scapy
 * [Módulos interesantes](#mdulos-interesantes)
+* [APIs interesantes](#apis-interesantes)
 * [Anexo: Uso de tshark básico](#anexo-uso-bsico-de-tshark)
 
 ## Requisitos e instalación
@@ -131,6 +132,11 @@ user@Gcomputer:path-tools-net$ python3 -m others.tshark-output-analysis others/s
 * [psutil](https://psutil.readthedocs.io/en/latest/): Ofrece información de los procesos y del sistema (incluyendo información de red).
 * [pyshark](https://kiminewt.github.io/pyshark/): Wrapper para utilizar **tshark** desde python (tanto la captura como el análisis de ficheros pcapng).
 * [requests](http://docs.python-requests.org/en/master/): Módulo para hacer peticiones HTTP de forma sencilla.
+
+## APIs interesantes
+
+* [MA:CV:en:do:rs](https://macvendors.com/): Obtener el fabricante de un interfaz de red a partir de su mac
+* [ipify](https://www.ipify.org/): Obtener la IP pública
 
 ## Anexo: Uso básico de tshark
 
