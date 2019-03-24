@@ -7,6 +7,7 @@ En este repositorio voy a incluir algunas herramientas básicas que cubren algun
 * [Herramientas](#herramientas)
     * [MAC Analyzer](#mac-analyzer)
     * [Network Interfaces](#network-interfaces)
+    * [My public IP](#get-my-ip)
     * [IP Class](#ip-class)
 * [Otros](#otros)
     * [Parseo de resúmenes generados con tshark](#anlisis-de-la-salida-de-tshark)
@@ -39,6 +40,8 @@ Esta herramienta recibe una MAC en el formato hexadecimal (usando como separador
 * Si es localmente administrada o es global
 * Si es unicat o multicast
 
+El nombre del fabricante lo obtiene haciendo uso del API [MA:CV:en:do:rs](https://macvendors.com/)
+
 Un ejemplo de funcionamiento:
 
 ```console
@@ -65,6 +68,18 @@ user@Gcomputer:~/path-tools-net$ python3 -m tools.net-interfaces
 lo: 00:00:00:00:00:00 - (global) - up
 wlp2s0: a4:c5:cd:e1:cd:9d - (global) - up
 ```
+
+### Get My Public IP
+
+Este herramienta muestra tu IP pública. Para ello usa el API de [ipify](https://www.ipify.org/).
+
+Un ejemplo de funcionamientoo
+
+```console
+user@Gcomputer:~/path-tools-net$ python3 -m tools.get-my-ip
+Your public is 37.134.241.2
+```
+
 
 ### IP Class
 
