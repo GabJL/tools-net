@@ -11,11 +11,10 @@ En este repositorio voy a incluir algunas herramientas básicas que cubren algun
     * [IP Class](#ip-class)
 * [Otros](#otros)
     * [Parseo de resúmenes generados con tshark](#anlisis-de-la-salida-de-tshark)
-    * Parseo de ficheros pcapng con pyshark
-    * Parseo de ficheros pcapng con scapy
 * [Módulos interesantes](#mdulos-interesantes)
 * [APIs interesantes](#apis-interesantes)
 * [Anexo: Uso de tshark básico](#anexo-uso-bsico-de-tshark)
+* 
 
 ## Requisitos e instalación
 
@@ -171,3 +170,20 @@ En ese ejemplo se analiza el fichero *traza.pcapng*, se van a exportar ciertos c
 destino (*-e eth.dst*), la origen (*-e eth.src*)... Se filtra mostrando solo aquellas tramas que tengan tipo asignado en 
 la trama ethernet (*-Y eth.type*). Finalmente, los campos se separan con espacions (*-E separator=/s*) y los campos con 
 varios valores (por ejemplo, *-e eth.ig*), también se separan con espacios (*-E aggregator=/s*).
+
+## Próximos desarrollos
+
+Ideas que tengo en mente añadir en algún momento (aseguro que saldrán antes que el Half-Life 3). El orden del listado es
+aleatorio sin ninguna relación del orden de implementación:
+
+* Simulador de protocolos de control de flujo/error (stop & wait, go-back-n, repeat selection)
+* Datos de una red (dada una iP/máscara indicar identificador, broadcast, rango de ips para hosts...)
+* Redes: Dada el esquema de redes (segmentos -num equipos y mtu- y routers)
+    * Asignación de IPs usando VLSM
+    * Simulación de fragmentación
+    * Simulación de paquetes ARP generados por un envío
+* Parseo de ficheros pcapng con pyshark o scapy
+* Análisis de tráfico en directo con pyshark o scapy
+* Envío de algo (ARP? ICMP?) con scapy
+* Ejemplo de sockets con python (tcp y udps)
+* Otros módulos de nivel de aplicación en python: paramiko (ssh), telnet, poplib, smtplib, imaplib, ftplib
