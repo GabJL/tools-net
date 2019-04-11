@@ -34,12 +34,10 @@ def get_ifaces_with_psutil():
 					else:
 						print("- down")
 
+					print(f" IP: {ip}")
 					if ip != None:
-						print(f" IP: {ip}")
 						print(f" Netmask: {nm}")
-						print(f" Broadcast: {bc}")
-					else:
-						print(" IP: Unassigned")
+						print(f" Broadcast: {bc}")				
 
 					if stats[i].duplex == psutil.NIC_DUPLEX_FULL:
 						print(" Duplex mode: FULL-DUPLEX")
