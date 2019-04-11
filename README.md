@@ -8,7 +8,7 @@ En este repositorio voy a incluir algunas herramientas básicas que cubren algun
     * [MAC Analyzer](#mac-analyzer)
     * [Network Interfaces](#network-interfaces)
     * [Network Interfaces: Advanced](#network-interfaces-advanced)
-    * [My public IP](#get-my-ip)
+    * [My public IP](#get-my-public-ip)
     * [IP Class](#ip-class)
 * [Otros](#otros)
     * [Parseo de resúmenes generados con tshark](#anlisis-de-la-salida-de-tshark)
