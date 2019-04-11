@@ -1,6 +1,6 @@
 import sys, socket
 sys.path.append('..')
-from utils import maclib, iplib
+from utils import maclib
 
 try:
 	import psutil
@@ -15,42 +15,46 @@ def get_ifaces_with_psutil():
 	for i in addrs:
 		for t in addrs[i]:
 			if t.family == socket.AF_INET:
-				ip = iplib.IPAddress(t.address)
+				ip = t.address
 				nm = t.netmask
 				bc = t.broadcast
 
 			if t.family == psutil.AF_LINK:
-				mac = maclib.MACAddress(t.address)
-				print(f"{i}: {mac}", end =" ")
+				try:
+					mac = maclib.MACAddress(t.address)
+					print(f"{i}: {mac}", end =" ")
 
-				if mac.is_local():
-					print("- (local)", end =" ")
-				else:
-					print("- (global)", end =" ")
+					if mac.is_local():
+						print("- (local)", end =" ")
+					else:
+						print("- (global)", end =" ")
 
-				if stats[i].isup:
-					print("- up")
-				else:
-					print("- down")
+					if stats[i].isup:
+						print("- up")
+					else:
+						print("- down")
 
-				if ip != None:
-					print(f" IP: {ip}")
-					print(f" Netmask: {nm}")
-					print(f" Broadcast: {bc}")
-				else:
-					print(" IP: Unassigned")
+					if ip != None:
+						print(f" IP: {ip}")
+						print(f" Netmask: {nm}")
+						print(f" Broadcast: {bc}")
+					else:
+						print(" IP: Unassigned")
 
-				if stats[i].duplex == psutil.NIC_DUPLEX_FULL:
-					print(" Duplex mode: FULL-DUPLEX")
-				elif stats[i].duplex == psutil.NIC_DUPLEX_HALF:
-					print(" Duplex mode: HALF-DUPLEX")
-				else:
-					print(" Duplex mode: Unknown")
-				print(f" Speed (MB/s): {stats[i].speed}")
-				print(f" MTU: {stats[i].mtu}")
+					if stats[i].duplex == psutil.NIC_DUPLEX_FULL:
+						print(" Duplex mode: FULL-DUPLEX")
+					elif stats[i].duplex == psutil.NIC_DUPLEX_HALF:
+						print(" Duplex mode: HALF-DUPLEX")
+					else:
+						print(" Duplex mode: Unknown")
+					print(f" Speed (MB/s): {stats[i].speed}")
+					print(f" MTU: {stats[i].mtu}")
 
-				print()
-				ip = None
+					print()
+					ip = None
+					break
+				except maclib.MACAddressException:
+					pass
 
 if __name__ == "__main__":
 	if option == 1:
