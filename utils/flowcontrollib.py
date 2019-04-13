@@ -148,20 +148,30 @@ class Protocol:
         self.sender_window_start = 0
         self.log = None
 
-    def __update_sender_window(self, n):
+    def __update_sender_window(self, n, v):
         for i in self.numbering[self.sender_window_start:self.sender_window_size + self.sender_window_start]:
             if self.numbering[i] == n:
-                self.sender_window[i] = not self.sender_window[i]
+                self.sender_window[i] = v
                 return
 
     def __is_in_receiver_window(self, n):
         first = None
+        is_first = None
         for i, v in enumerate(self.numbering):
             if not self.receiver_window[i] and first is None:
                 first = i
             if first is not None and (i - first) < self.receiver_window_size and v == n:
-                return True, i == first, self.receiver_window[first]
-        return False, False, 0
+                is_first = i == first
+        if is_first is None:
+            return False, False, self.numbering[first-1] if first is not None else self.numbering[-1], 0
+        else:
+            last = 0
+            for i, v in enumerate(self.numbering):
+                if self.receiver_window[i]:
+                    last = i
+            if last < first:
+                last = first
+            return True, is_first, self.numbering[first], self.numbering[last]
 
     def __update_receiver_window(self, n):
         for i, v in enumerate(self.numbering):
@@ -226,7 +236,7 @@ class Protocol:
                 elif ev["type"] == Event.TRANS_FRAME_END:
                     self.queue.add_event(Event.TIMEOUT, ev["time"] + self.configuration["timeout"], ev["seq_number"])
                     self.frames_sent += 1
-                    self.__update_sender_window(ev["seq_number"])
+                    self.__update_sender_window(ev["seq_number"], True)
                     log.append({"time": ev["time"], "entity": 'sender', "type": "Frame completely sent",
                                 "number": ev["seq_number"], "window": self.__sender_window_to_str()})
                     if self.frames_sent in self.configuration["frames lost"]:
@@ -243,10 +253,10 @@ class Protocol:
                             if self.sender_window[i]:
                                 self.queue.add_event_front(Event.SEND_FRAME, ev["time"], self.numbering[i])
                                 self.queue.remove_timeout(self.numbering[i])
-                                self.__update_sender_window(self.numbering[i])
+                                self.__update_sender_window(self.numbering[i], False)
                     else:
                         self.queue.add_event_front(Event.SEND_FRAME, ev["time"], ev["seq_number"])
-                        self.__update_sender_window(ev["seq_number"])
+                        self.__update_sender_window(ev["seq_number"], False)
                     log.append({"time": ev["time"], "entity": 'sender', "type": "Timeout", "number": ev["seq_number"],
                                 "window": self.__sender_window_to_str()})
                 elif ev["type"] == Event.RECEIVE_FRAME:
@@ -255,19 +265,25 @@ class Protocol:
                     log.append({"time": ev["time"], "entity": 'receiver', "type": "Frame received",
                                 "number": ev["seq_number"], "window": self.__receiver_window_to_str()})
                 elif ev["type"] == Event.PROC_ACK_TIME:
-                    is_in, first, val = self.__is_in_receiver_window(ev["seq_number"])
+                    is_in, first, val_ini, val_end = self.__is_in_receiver_window(ev["seq_number"])
                     if is_in:
                         next_time = ev["time"] + self.configuration["ack transmission time"]
+                        self.__update_receiver_window(ev["seq_number"])
                         if first:
-                            self.queue.add_event(Event.TRANS_ACK_END, next_time, ev["seq_number"])
+                            self.queue.add_event(Event.TRANS_ACK_END, next_time, val_end)
                             log.append({"time": ev["time"], "entity": 'receiver', "type": "Start to send ACK",
-                                        "number": ev["seq_number"]+1, "window": self.__receiver_window_to_str()})
+                                        "number": val_end+1, "window": self.__receiver_window_to_str()})
                         else:
-                            self.queue.add_event(Event.TRANS_NACK_END, next_time, val)
+                            self.queue.add_event(Event.TRANS_NACK_END, next_time, val_ini)
                             log.append({"time": ev["time"], "entity": 'receiver', "type": "Start to send NACK",
-                                        "number": val, "window": self.__receiver_window_to_str()})
+                                        "number": val_ini, "window": self.__receiver_window_to_str()})
+                    else:
+                        next_time = ev["time"] + self.configuration["ack transmission time"]
+                        self.queue.add_event(Event.TRANS_ACK_END, next_time, val_ini)
+                        log.append({"time": ev["time"], "entity": 'receiver', "type": "Start to resend ACK",
+                                    "number": val_ini+1, "window": self.__receiver_window_to_str()})
+
                 elif ev["type"] == Event.TRANS_ACK_END:
-                    self.__update_receiver_window(ev["seq_number"])
                     next_time = ev["time"] + self.configuration["ack propagation time"]
                     self.acks_sent += 1
                     if self.acks_sent in self.configuration["acks lost"]:
@@ -278,7 +294,6 @@ class Protocol:
                         log.append({"time": ev["time"], "entity": 'receiver', "type": "ACK sent",
                                     "number": ev["seq_number"]+1, "window": self.__receiver_window_to_str()})
                 elif ev["type"] == Event.TRANS_NACK_END:
-                    self.__update_receiver_window(ev["seq_number"])
                     next_time = ev["time"] + self.configuration["ack propagation time"]
                     self.acks_sent += 1
                     if self.acks_sent in self.configuration["acks lost"]:
