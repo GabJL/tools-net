@@ -43,7 +43,7 @@ class EventQueue:
         return ev
 
     def remove_timeout(self, seq_number=-1):
-        for i , ev in enumerate(self.queue):
+        for i, ev in enumerate(self.queue):
             if ev["type"] == Event.TIMEOUT and (seq_number == -1 or ev["seq_number"] == seq_number):
                 del self.queue[i]
 
@@ -67,12 +67,25 @@ class EventQueue:
             if ev["type"] == Event.SEND_FRAME:
                 ev["time"] = t
 
+
 class ProtocolError(Exception):
     pass
 
 
 class Protocol:
     def __init__(self, filename):
+        self.configuration = dict()
+        self.configuration["frame transmission time"] = 1
+        self.configuration["frame propagation time"] = 1
+        self.configuration["processing time"] = 0.5
+        self.configuration["ack transmission time"] = 0.5
+        self.configuration["ack propagation time"] = 1
+        self.configuration["timeout"] = 12
+        self.frames_sent = 0
+        self.acks_sent = 0
+        self.queue = EventQueue()
+        self.sender_window_start = 0
+        self.log = None
         valid_protocols = ["Stop & Wait", "Go-Back-N", "Selective Repeat"]
         try:
             with open(filename) as f:
@@ -101,7 +114,6 @@ class Protocol:
                 if "time" in k and type(v) is not list and v < 0:
                     raise ProtocolError(f"{k} should be >= 0")
 
-            self.__set_default_values()
             for k, v in info.items():
                 self.configuration[k] = v
 
@@ -110,6 +122,7 @@ class Protocol:
                 self.configuration["bit for numbering"] = 1
                 self.sender_window_size = 1
                 self.receiver_window_size = 1
+                self.max_number = 2
             elif self.configuration["protocol"] == "Go-Back-N":
                 if self.configuration.get("sender window", self.max_number) >= self.max_number:
                     raise ProtocolError("Sender window size invalid")
@@ -134,24 +147,10 @@ class Protocol:
         except ValueError:
             raise ProtocolError(f"Error reading json file {filename}")
 
-    def __set_default_values(self):
-        self.configuration = dict()
-        self.configuration["frame transmission time"] = 1
-        self.configuration["frame propagation time"] = 1
-        self.configuration["processing time"] = 0.5
-        self.configuration["ack transmission time"] = 0.5
-        self.configuration["ack propagation time"] = 1
-        self.configuration["timeout"] = 12
-        self.frames_sent = 0
-        self.acks_sent = 0
-        self.queue = EventQueue()
-        self.sender_window_start = 0
-        self.log = None
-
     def __update_sender_window(self, n, v):
-        for i in self.numbering[self.sender_window_start:self.sender_window_size + self.sender_window_start]:
-            if self.numbering[i] == n:
-                self.sender_window[i] = v
+        for i in range(self.sender_window_size):
+            if self.numbering[i + self.sender_window_start] == n:
+                self.sender_window[i + self.sender_window_start] = v
                 return
 
     def __is_in_receiver_window(self, n):
@@ -209,6 +208,9 @@ class Protocol:
                     res += f" {self.numbering[i]}"
         res += " ]"
         return res
+
+    def __next(self, i):
+        return (i+1) % self.max_number
 
     def run(self):
         log = []
@@ -272,7 +274,7 @@ class Protocol:
                         if first:
                             self.queue.add_event(Event.TRANS_ACK_END, next_time, val_end)
                             log.append({"time": ev["time"], "entity": 'receiver', "type": "Start to send ACK",
-                                        "number": val_end+1, "window": self.__receiver_window_to_str()})
+                                        "number": self.__next(val_end), "window": self.__receiver_window_to_str()})
                         else:
                             self.queue.add_event(Event.TRANS_NACK_END, next_time, val_ini)
                             log.append({"time": ev["time"], "entity": 'receiver', "type": "Start to send NACK",
@@ -281,18 +283,18 @@ class Protocol:
                         next_time = ev["time"] + self.configuration["ack transmission time"]
                         self.queue.add_event(Event.TRANS_ACK_END, next_time, val_ini)
                         log.append({"time": ev["time"], "entity": 'receiver', "type": "Start to resend ACK",
-                                    "number": val_ini+1, "window": self.__receiver_window_to_str()})
+                                    "number": self.__next(val_ini), "window": self.__receiver_window_to_str()})
 
                 elif ev["type"] == Event.TRANS_ACK_END:
                     next_time = ev["time"] + self.configuration["ack propagation time"]
                     self.acks_sent += 1
                     if self.acks_sent in self.configuration["acks lost"]:
                         log.append({"time": ev["time"], "entity": 'receiver', "type": "ACK lost",
-                                    "number": ev["seq_number"]+1, "window": self.__receiver_window_to_str()})
+                                    "number": self.__next(ev["seq_number"]), "window": self.__receiver_window_to_str()})
                     else:
                         self.queue.add_event(Event.RECEIVE_ACK, next_time, ev["seq_number"])
                         log.append({"time": ev["time"], "entity": 'receiver', "type": "ACK sent",
-                                    "number": ev["seq_number"]+1, "window": self.__receiver_window_to_str()})
+                                    "number": self.__next(ev["seq_number"]), "window": self.__receiver_window_to_str()})
                 elif ev["type"] == Event.TRANS_NACK_END:
                     next_time = ev["time"] + self.configuration["ack propagation time"]
                     self.acks_sent += 1
@@ -309,9 +311,10 @@ class Protocol:
                         for i in range(self.sender_window_start, pos+1):
                             self.queue.remove_timeout(self.numbering[i])
                         self.sender_window_start = pos+1
-                        log.append({"time": ev["time"], "entity": 'sender', "type": "ACK received",
-                                    "number": ev["seq_number"]+1, "window": self.__sender_window_to_str()})
                         self.queue.set_send_current_time(ev["time"])
+                    log.append({"time": ev["time"], "entity": 'sender', "type": "ACK received",
+                                "number": self.__next(ev["seq_number"]), "window": self.__sender_window_to_str()})
+
                 elif ev["type"] == Event.RECEIVE_NACK:
                     self.queue.remove_timeout(ev["seq_number"])
                     self.queue.add_event_front(Event.SEND_FRAME, ev["time"], ev["seq_number"])
@@ -342,9 +345,3 @@ class Protocol:
                 print(f"{e['time']:<6} {e['window']:<20} {e['type'] + seq:<30}")
             else:
                 print(f"{e['time']:<6} {'':<20} {'':<30} {e['type'] + seq:>30} {e['window']:<20} ")
-
-
-if __name__=="__main__":
-    prot = Protocol('example-prot.json')
-    prot.run()
-    prot.write()

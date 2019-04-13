@@ -1,0 +1,14 @@
+{
+  "protocol": "Selective Repeat",
+  "bit for numbering": 2,
+  "number of frames": 5,
+  "frames lost": [3],
+  "acks lost": [],
+  "sender window": 2,
+  "frame transmission time": 2,
+  "frame propagation time":2,
+  "processing time": 0.25,
+  "ack transmission time":0.75,
+  "ack propagation time":2,
+  "timeout":14
+}
