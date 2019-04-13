@@ -8,6 +8,7 @@ En este repositorio voy a incluir algunas herramientas básicas que cubren algun
     * [Flow Error Control Simulator](#flow-error-control-simulator)
     * [MAC Analyzer](#mac-analyzer)
     * [Network Interfaces](#network-interfaces)
+    * [Network Interfaces: Advanced](#network-interfaces-advanced)
     * [My public IP](#get-my-public-ip)
     * [IP Class](#ip-class)
 * [Otros](#otros)
@@ -149,6 +150,37 @@ Un ejemplo de funcionamiento:
 user@Gcomputer:~/path-tools-net$ python3 -m tools.net-interfaces
 lo: 00:00:00:00:00:00 - (global) - up
 wlp2s0: a4:c5:cd:e1:cd:9d - (global) - up
+```
+
+### Network Interfaces: Advanced
+
+Esta herramienta muestra los interfaces de red disponibles en el equipo y la siguiente información de cada interfaz:
+* IP, máscara de red y dirección de broadcast (si están asignadas)
+* El modo de dúplex
+* La velocidad en MB/s (0 si no puede ser determinada)
+* El MTU
+
+Esta herramienta necesita tener instalados el módulo netifaces o psutil.
+
+Un ejemplo de funcionamiento:
+
+```console
+user@Gcomputer:~/path-tools-net$ python3 -m tools.net-interfaces-advanced
+lo: 00:00:00:00:00:00 - (global) - up
+ IP: 127.0.0.1
+ Netmask: 255.0.0.0
+ Broadcast: None
+ Duplex mode: Unknown
+ Speed (MB/s): 0
+ MTU: 65536
+
+ens33: 00:0c:29:0e:f9:e2 - (global) - up
+ IP: 172.16.157.162
+ Netmask: 255.255.255.0
+ Broadcast: 172.16.157.255
+ Duplex mode: FULL-DUPLEX
+ Speed (MB/s): 1000
+ MTU: 1500
 ```
 
 ### Get My Public IP
