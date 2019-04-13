@@ -5,9 +5,10 @@ En este repositorio voy a incluir algunas herramientas básicas que cubren algun
 ## Índice
 * [Requisitos e Instalación](#requisitos-e-instalacin)
 * [Herramientas](#herramientas)
+    * [Flow Error Control Simulator](#flow-error-control-simulator)
     * [MAC Analyzer](#mac-analyzer)
     * [Network Interfaces](#network-interfaces)
-    * [My public IP](#get-my-ip)
+    * [My public IP](#get-my-public-ip)
     * [IP Class](#ip-class)
 * [Otros](#otros)
     * [Parseo de resúmenes generados con tshark](#anlisis-de-la-salida-de-tshark)
@@ -15,6 +16,7 @@ En este repositorio voy a incluir algunas herramientas básicas que cubren algun
 * [APIs interesantes](#apis-interesantes)
 * [Anexo: Uso de tshark básico](#anexo-uso-bsico-de-tshark)
 * [Futuros desarrollos](#prximos-desarrollos) 
+* [Contribuir](#contribuir)
 
 ## Requisitos e instalación
 
@@ -30,6 +32,86 @@ user@computer:path-tools-net$ pip3 install -r requirements.txt
 No requiere instalación, solo descargue o clone el respositorio para utilizarlo.
 
 ## Herramientas
+
+### Flow Error Control Simulator
+
+Esta herramienta es un simulador para los protocolos **Parada y Espera**, **Go-Back-N** y **Reoetición Selectiva**.
+
+En un fichero de tipo json se le pasan los parámetros sobre el protocolo a usar. Un ejemplo de su uso:
+
+```console
+user@computer:path-tools-net$ python3 -m tools.flow-control-simulator tools/samples/example-prot.json 
+time   Sender Window        Sender Action                                Receiver Activon Receiver Window     
+0      [ 0 1 ]              Initial State                 
+0                                                                           Initial State [ 0 1 ]              
+0      [ 0 1 ]              Start to send Frame (T0)      
+2      [ (0) 1 ]            Frame completely sent (T0)    
+2      [ (0) 1 ]            Start to send Frame (T1)      
+4      [ (0) (1) ]          Frame completely sent (T1)    
+4                                                                     Frame received (T0) [ 0 1 ]              
+4.25                                                             Start to send ACK (ACK1) [ 1 2 ]              
+5.0                                                                       ACK sent (ACK1) [ 1 2 ]              
+6                                                                     Frame received (T1) [ 1 2 ]              
+6.25                                                             Start to send ACK (ACK2) [ 2 3 ]              
+7.0    [ (1) 2 ]            ACK received (ACK1)           
+7.0    [ (1) 2 ]            Start to send Frame (T2)      
+7.0                                                                       ACK sent (ACK2) [ 2 3 ]              
+9.0    [ 2 3 ]              ACK received (ACK2)           
+9.0    [ (2) 3 ]            Frame completely sent (T2)    
+9.0    [ (2) 3 ]            Frame lost (T2)               
+9.0    [ (2) 3 ]            Start to send Frame (T3)      
+11.0   [ (2) (3) ]          Frame completely sent (T3)    
+13.0                                                                  Frame received (T3) [ 2 3 ]              
+13.25                                                          Start to send NACK (NACK2) [ 2 (3) ]            
+14.0                                                                    NACK sent (NACK2) [ 2 (3) ]            
+16.0   [ (2) (3) ]          NACK received - retransmit (NACK2)
+16.0   [ (2) (3) ]          Start to send Frame (T2)      
+18.0   [ (2) (3) ]          Frame completely sent (T2)    
+20.0                                                                  Frame received (T2) [ 2 (3) ]            
+20.25                                                            Start to send ACK (ACK0) [ 0 ]                
+21.0                                                                      ACK sent (ACK0) [ 0 ]                
+23.0   [ 0 ]                ACK received (ACK0)           
+23.0   [ 0 ]                Start to send Frame (T0)      
+25.0   [ (0) ]              Frame completely sent (T0)    
+27.0                                                                  Frame received (T0) [ 0 ]                
+27.25                                                            Start to send ACK (ACK1) [ ]                  
+28.0                                                                      ACK sent (ACK1) [ ]                  
+30.0   [ ]                  ACK received (ACK1)           
+
+```
+
+Este programa es bastante más complejo y menos probado si detecta un caso erróneo, avise.
+
+Ejemplo de fichero de configuración:
+```json
+{
+  "protocol": "Selective Repeat", 
+  "bit for numbering": 2,  
+  "number of frames": 5, 
+  "frames lost": [3], 
+  "acks lost": [], 
+  "sender window": 2, 
+  "frame transmission time": 2, 
+  "frame propagation time":2, 
+  "processing time": 0.25, 
+  "ack transmission time":0.75, 
+  "ack propagation time":2, 
+  "timeout":14 
+}
+```
+Comnetario sobre el fichero de configuración:
+* "protocol": Protocolo a usar (Valores válidos: Stop & Wait, Go-Back-N y Selective Repeat)
+* "bit for numbering": Número de bits usados para numerar (Obligatorio excepto para S&W)
+* "number of frames": Número de tramas a enviar (Obligatorio)
+* "frames lost": Lista con tramas perdidas (Opcional - valor por defecto: [])
+* "acks lost": Lista con acks/nacks perdidas (Opcional - valor por defecto: [])
+* "sender window": Tamaño de la ventana del emisor (Obligatorio excepto para S&W)
+* "frame transmission time": Tiempo de transmisión de las tramas (Opcional - valor por defecto: 1)
+* "frame propagation time": Tiempo de progración de las tramas (Opcional - valor por defecto: 1)
+* "processing time": Tiempo de procesamiento de las tramas (Opcional - valor por defecto 0.5)
+* "ack transmission time": Tiempo de transmisión de los ACKs/NACKs (Opcional - valor por defecto 0.5)
+* "ack propagation time": Tiempo de propagación de los ACKs/NACKs  (Opcional - valor por defecto 1)
+* "timeout": Tiempo máximo de espera del ACK (Opcional - valor por defecto 12)
 
 ### MAC Analyzer
 
@@ -187,3 +269,13 @@ aleatorio sin ninguna relación del orden de implementación:
 * Envío de algo (ARP? ICMP?) con scapy
 * Ejemplo de sockets con python (tcp y udps)
 * Otros módulos de nivel de aplicación en python: paramiko (ssh), telnet, poplib, smtplib, imaplib, ftplib
+
+## Contribuir
+
+Si quiere añadir un desarrollo haga un *Pull Request* con su código, solo recuerde:
+* Meta su el *main* herramienta en el módulo **tools**
+* El resto de ficheros en **utils**
+* Actualice el **README.md** describiendo su herramienta e indicando la autoría
+
+También si detecta un error puede corregirlo y hacer un *Pull Request* o poner un *Issue* para que yo lo intente 
+solucionar. 
