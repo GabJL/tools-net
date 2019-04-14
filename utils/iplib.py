@@ -6,11 +6,11 @@ class IPAddressException(Exception):
 
 class IPAddress():
     def __init__(self, ip):
-        if not self.__check_mac(ip):
+        if not self.__check_ip(ip):
             raise IPAddressException("MAC incorrecta")
         self.ip = ip
 
-    def __check_mac(self, ip):
+    def __check_ip(self, ip):
         if not re.search(r"^([0-9]{1,3}.){3}[0-9]{1,3}$", ip):
             return False
         values = ip.split(".")
