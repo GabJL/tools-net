@@ -7,7 +7,7 @@ class IPAddressException(Exception):
 class IPAddress():
     def __init__(self, ip):
         if not self.__check_ip(ip):
-            raise IPAddressException("MAC incorrecta")
+            raise IPAddressException("Incorrect IP")
         self.ip = ip
 
     def __check_ip(self, ip):
