@@ -41,3 +41,18 @@ class IPAddress():
             return 'D'
         else:
             return 'E'
+
+    def to_number(self):
+        values = self.ip.split(".")
+        number = 0
+        for byte in values:
+            number = number*256 + int(byte)
+
+        return number
+
+    def from_number(self, number):
+        self.ip = str(number % 256)
+        number = number // 256
+        for i in range(3):
+            self.ip = str(number % 256) + '.' + self.ip
+            number = number // 256
