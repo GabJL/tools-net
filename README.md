@@ -43,7 +43,7 @@ En un fichero de tipo json se le pasan los parámetros sobre el protocolo a usar
 
 ```console
 user@computer:path-tools-net$ python3 -m tools.flow-control-simulator tools/samples/example-prot.json 
-time   Sender Window        Sender Action                                Receiver Activon Receiver Window     
+time   Sender Window        Sender Action                                Receiver Action Receiver Window     
 0      [ 0 1 ]              Initial State                 
 0                                                                           Initial State [ 0 1 ]              
 0      [ 0 1 ]              Start to send Frame (T0)      

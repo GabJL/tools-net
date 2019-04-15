@@ -329,7 +329,7 @@ class Protocol:
             return
 
         print('{0:<6} {1:<20} {2:<30} {3:>30} {4:<20}'.format("time", "Sender Window", "Sender Action",
-                                                              "Receiver Activon", "Receiver Window"))
+                                                              "Receiver Action", "Receiver Window"))
         for e in self.log:
             if 'NACK' in e['type']:
                 seq = f" (NACK{str(e['number'])})"
