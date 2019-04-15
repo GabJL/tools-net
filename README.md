@@ -11,6 +11,7 @@ En este repositorio voy a incluir algunas herramientas básicas que cubren algun
     * [Network Interfaces: Advanced](#network-interfaces-advanced)
     * [My public IP](#get-my-public-ip)
     * [IP Class](#ip-class)
+    * [Net Information](#network-information)
 * [Otros](#otros)
     * [Parseo de resúmenes generados con tshark](#anlisis-de-la-salida-de-tshark)
 * [Módulos interesantes](#mdulos-interesantes)
@@ -309,7 +310,7 @@ varios valores (por ejemplo, *-e eth.ig*), también se separan con espacios (*-E
 Ideas que tengo en mente añadir en algún momento (aseguro que saldrán antes que el Half-Life 3). El orden del listado es
 aleatorio sin ninguna relación del orden de implementación:
 
-* Simulador de protocolos de control de flujo/error (stop & wait, go-back-n, repeat selection)
+* ~~Simulador de protocolos de control de flujo/error (stop & wait, go-back-n, repeat selection)~~
 * ~~Datos de una red (dada una iP/máscara indicar identificador, broadcast, rango de ips para hosts...)~~
 * Redes: Dada el esquema de redes (segmentos -num equipos y mtu- y routers)
     * Asignación de IPs usando VLSM
