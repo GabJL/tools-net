@@ -3,8 +3,10 @@ import re
 sys.path.append('..')
 from utils import iplib
 
+
 class NetworkException(Exception):
     pass
+
 
 class Network():
     def __init__(self, ip, netmask):
@@ -29,7 +31,7 @@ class Network():
                 valid, self.prefix = self.__check_mask(self.netmask.to_number())
                 if not valid:
                     raise NetworkException(f"{netmask} is not a valid network mask")
-                self.wildcard = 32 - self.netmask
+                self.wildcard = 32 - self.prefix
             except iplib.IPAddressException:
                 raise NetworkException("Netmask is not valid (it should be a mask or a prefix)")
         else:
