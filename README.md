@@ -11,6 +11,7 @@ En este repositorio voy a incluir algunas herramientas básicas que cubren algun
     * [Network Interfaces: Advanced](#network-interfaces-advanced)
     * [My public IP](#get-my-public-ip)
     * [IP Class](#ip-class)
+    * [Net Information](#network-information)
 * [Otros](#otros)
     * [Parseo de resúmenes generados con tshark](#anlisis-de-la-salida-de-tshark)
 * [Módulos interesantes](#mdulos-interesantes)
@@ -187,7 +188,7 @@ ens33: 00:0c:29:0e:f9:e2 - (global) - up
 
 Este herramienta muestra tu IP pública. Para ello usa el API de [ipify](https://www.ipify.org/).
 
-Un ejemplo de funcionamientoo
+Un ejemplo de funcionamiento:
 
 ```console
 user@Gcomputer:~/path-tools-net$ python3 -m tools.get-my-ip
@@ -199,11 +200,30 @@ Your public is 37.134.241.2
 
 Este programa recibe como parámetro una IPv4 válida (en formato decimal-punto) y nos indica a qué clase (A a F) pertenece.
 
-Un ejemplo de funcionamientoo
+Un ejemplo de funcionamiento:
 
 ```console
 user@Gcomputer:~/path-tools-net$ python3 -m tools.ip-class 150.214.56.9
 150.214.56.9 is from class B
+```
+
+### Network Information
+
+Esta herramienta recibe una IP y una máscara y devuelve toda la información de la red indicada. La máscara puede indicarse
+tanto en formato punto-decimal como con el prefijo.
+
+Un ejemplo de funcionamiento:
+
+```console
+user@Gcomputer:~/path-tools-net$  python3 -m tools.net-info 192.168.164.15 22
+Network: 192.168.164.0/22
+- Network ID: 192.168.164.0
+- Network Mask: 255.255.252.0
+- Broadcast: 192.168.167.255
+- First Host: 192.168.164.1
+- Last Host: 192.168.167.254
+- Number of hosts: 1022
+
 ```
 
 ## Otros
@@ -291,7 +311,7 @@ Ideas que tengo en mente añadir en algún momento (aseguro que saldrán antes q
 aleatorio sin ninguna relación del orden de implementación:
 
 * ~~Simulador de protocolos de control de flujo/error (stop & wait, go-back-n, repeat selection)~~
-* Datos de una red (dada una iP/máscara indicar identificador, broadcast, rango de ips para hosts...)
+* ~~Datos de una red (dada una iP/máscara indicar identificador, broadcast, rango de ips para hosts...)~~
 * Redes: Dada el esquema de redes (segmentos -num equipos y mtu- y routers)
     * Asignación de IPs usando VLSM
     * Simulación de fragmentación
