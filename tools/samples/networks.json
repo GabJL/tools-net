@@ -1,0 +1,29 @@
+{
+  "configuration": {
+      "IP": "192.168.0.0",
+      "mask": "255.255.0.0",
+      "type": "VLSM"
+    }
+  },
+  "networks": [
+    {
+      "name": "LAN1",
+      "hosts": 100,
+      "MTU": 1500
+    },
+    {
+      "name": "LAN2",
+      "hosts": 100,
+      "MTU": 1500
+    }
+  ],
+  "named. hosts": [{
+      "name": "R1",
+      "networks": ["LAN1", "LAN2"]
+    },
+    {
+      "name": "A",
+      "networks": ["LAN1"]
+    }
+  ]
+}
