@@ -57,3 +57,30 @@ class MACAddress():
 
     def is_broadcast(self):
         return self.mac == "ff:ff:ff:ff:ff:ff"
+
+    def __to_number(self):
+        number = 0
+        for value in self.mac:
+            if value != ':':
+                number = number*16 + int(value, 16)
+        return number
+
+    def __from_number(self, number):
+        self.mac = hex(number % 16)[-1]
+        number = number // 16
+        pos = 2
+        while pos < 13:
+            if pos == 3 or pos == 5 or pos == 7 or pos == 9 or pos == 11:
+                self.mac = ':' + self.mac
+            self.mac = hex(number % 16)[-1] + self.mac
+            number = number // 16
+            pos += 1
+
+    def next_mac(self):
+        nmac = MACAddress(self.mac)
+        if self.is_broadcast():
+            return nmac
+        else:
+            n = nmac.__to_number() + 1
+            nmac.__from_number(n)
+            return nmac
