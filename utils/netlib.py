@@ -76,3 +76,16 @@ class Network():
 
     def __str__(self):
         return str(self.netid) + '/' + str(self.prefix)
+
+    def overlap(self, other: 'Network'):
+        first1 = self.netid
+        last1 = iplib.IPAddress(self.get_broadcast())
+        first2 = other.netid
+        last2 = iplib.IPAddress(other.get_broadcast())
+
+        if last1 < first2:
+            return False
+        elif last2 < first1:
+            return False
+        else:
+            return True
