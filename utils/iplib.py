@@ -56,3 +56,21 @@ class IPAddress():
         for i in range(3):
             self.ip = str(number % 256) + '.' + self.ip
             number = number // 256
+
+    def __lt__(self, other):
+        return self.to_number() < other.to_number()
+
+    def __le__(self, other):
+        return self.to_number() <= other.to_number()
+
+    def __eq__(self, other):
+        return self.to_number() == other.to_number()
+
+    def __ne__(self, other):
+        return self.to_number() != other.to_number()
+
+    def __gt__(self, other):
+        return self.to_number() > other.to_number()
+
+    def __ge__(self, other):
+        return self.to_number() >= other.to_number()
