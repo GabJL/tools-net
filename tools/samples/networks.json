@@ -17,7 +17,7 @@
       "MTU": 1500
     }
   ],
-  "named. hosts": [{
+  "named nodes": [{
       "name": "R1",
       "networks": ["LAN1", "LAN2"]
     },
