@@ -89,3 +89,11 @@ class Network():
             return False
         else:
             return True
+
+    def is_in(self, other):
+        first1 = self.netid
+        last1 = iplib.IPAddress(self.get_broadcast())
+        first2 = other.netid
+        last2 = iplib.IPAddress(other.get_broadcast())
+
+        return first2 >= first1 and last2 <= last1
