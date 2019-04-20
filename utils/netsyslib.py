@@ -8,9 +8,13 @@ import json
 class Node:
     def __init__(self, name):
         self.name = name
+        self.border = False
         self.interfaces = []
         self.arp_table = []
         self.ip_table = []
+
+    def set_as_border(self):
+        self.border = True
 
     def new_interface(self):
         pos = len(self.interfaces)
@@ -21,6 +25,9 @@ class Node:
     def remove_interface(self, pos):
         if len(self.interfaces) > pos:
             del (self.interfaces[pos])
+
+    def get_name(self):
+        return self.name
 
     def get_interface(self, pos):
         if len(self.interfaces) > pos:
@@ -34,9 +41,9 @@ class Node:
         if len(self.interfaces) > pos:
             self.interfaces[pos]['mac'] = mac
 
-    def set_net(self, pos, net):
+    def set_net(self, pos, network):
         if len(self.interfaces) > pos:
-            self.interfaces[pos]['net'] = net
+            self.interfaces[pos]['net'] = network
 
     def get_number_of_interfaces(self):
         return len(self.interfaces)
@@ -46,6 +53,8 @@ class Node:
         description += f"- {self.name}:\n"
         for i in self.interfaces:
             description += f"\t{i['name']} - {i['mac']} | {i['ip']} ({i['net']['name']})\n"
+        if self.border:
+            description += f"\tThis node allows to connect to Internet\n"
         return description
 
 
@@ -58,8 +67,8 @@ class NetSystem:
         try:
             with open(filename) as f:
                 data = json.load(f)
-        except Exception as e:
-            raise NetSystemException(f"There is a problem reading the configuration file {filename}: {e}")
+        except Exception as exc:
+            raise NetSystemException(f"There is a problem reading the configuration file {filename}: {exc}")
 
         self.__analyze_nets(data)
 
@@ -70,8 +79,8 @@ class NetSystem:
         try:
             self.system_net = netlib.Network(d["configuration"].get("IP", None),
                                              d["configuration"].get("mask", None))
-        except netlib.NetworkException as e:
-            raise NetSystemException(f"The provided network is not valid ({e})")
+        except netlib.NetworkException as exc:
+            raise NetSystemException(f"The provided network is not valid ({exc})")
 
         if d["configuration"].get("type") not in ["VLSM", "MaxNets", "MinNets", "Preconfigured"]:
             raise NetSystemException(
@@ -90,7 +99,7 @@ class NetSystem:
             self.networks[-1]["related hosts"] = []
 
         self.nodes = []
-        for h in d.get("named nodes",[]):
+        for h in d.get("named nodes", []):
             if not d.get("networks", []):
                 raise NetSystemException(f"Node {h['name']} is not assigned to any network")
             added = False
@@ -143,7 +152,7 @@ class NetSystem:
                 next_ip = iplib.IPAddress(n["network"].get_broadcast())
                 next_ip.from_number(next_ip.to_number()+1)
                 free_ip = str(next_ip)
-        else: # preconfigured
+        else:
             for n in self.networks:
                 try:
                     n["network"] = netlib.Network(n["netid"], n["netmask"])
@@ -159,6 +168,16 @@ class NetSystem:
         self.__create_interfaces()
         if d['configuration']['type'] != 'Preconfigured':
             self.__assign_ips()
+
+        border_router = d["configuration"].get("border router", None)
+        self.has_Internet = False
+        if border_router:
+            for n in self.nodes:
+                if n.get_name() == border_router:
+                    n.set_as_border()
+                    self.has_Internet = True
+                    break
+
 
     def __create_interfaces(self):
         used_macs = []
@@ -199,7 +218,6 @@ class NetSystem:
                 interface['ip'] = iplib.IPAddress(str(interface['net']['first_ip_free']))
                 ip = interface['net']['first_ip_free']
                 ip.from_number(ip.to_number() + 1)
-                #interface['net']['first_ip_free'] = ip
 
     @staticmethod
     def __min_power_of_2(n):
@@ -225,5 +243,3 @@ class NetSystem:
         for n in self.nodes:
             description += str(n)
         return description
-
-
