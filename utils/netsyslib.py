@@ -41,6 +41,13 @@ class Node:
     def get_number_of_interfaces(self):
         return len(self.interfaces)
 
+    def __str__(self):
+        description = ""
+        description += f"- {self.name}:\n"
+        for i in self.interfaces:
+            description += f"\t{i['name']} - {i['mac']} | {i['ip']} ({i['net']['name']})\n"
+        return description
+
 
 class NetSystemException(Exception):
     pass
@@ -202,4 +209,21 @@ class NetSystem:
             bits += 1
             pow *= 2
         return bits
+
+    def __str__(self):
+        description = ""
+        description += "Networks:\n"
+        for n in self.networks:
+            description += f"- {n['name']}\n"
+            description += f"\t ID/Mask {n['network']}\n"
+            description += f"\t Broadcast: {n['network'].get_broadcast()}\n"
+            ip = iplib.IPAddress('0.0.0.0')
+            ip.from_number(n['first_ip_free'].to_number() + n['hosts'] -1)
+            description += f"\t Host: {n['first_ip_free']}-{ip}\n"
+            description += f"\t MTU: {n['MTU']}\n"
+        description += "Nodes:\n"
+        for n in self.nodes:
+            description += str(n)
+        return description
+
 
