@@ -67,6 +67,7 @@ class NetSystem:
         for h in d.get("named nodes",[]):
             if not d.get("networks", []):
                 raise NetSystemException(f"Node {h['name']} is not assigned to any network")
+            added = False
             for n in h["networks"]:
                 for n1 in self.networks:
                     if n == n1['name']:
@@ -74,7 +75,9 @@ class NetSystem:
                             raise NetSystemException(f"Node {h['name']} is repeated in network {n1['name']}")
                         n1["related hosts"].append(h['name'])
                         n1["ips needed"] += 1
-                        self.nodes.append(h)
+                        if not added:
+                            self.nodes.append(h)
+                            added = True
                         break
                 else:
                     raise NetSystemException(f"Node {h['name']} is assigned to unknown network ({n})")
@@ -127,6 +130,26 @@ class NetSystem:
                         if __name__ == '__main__':
                             if n["network"].overlap(n1["network"]):
                                 raise NetSystemException(f"{n['name']} and {n1['name']} are overlapping nets.")
+        self.__assign_macs()
+
+    def __assign_macs(self):
+        used_macs = []
+        for n in self.nodes:
+            if n.get('macs', None):
+                used_macs += n['macs']
+            else:
+                n['macs'] = []
+
+        free_mac = maclib.MACAddress('00:00:00:00:00:00')
+        while str(free_mac) in used_macs:
+            free_mac = free_mac.next_mac()
+
+        for n in self.nodes:
+            while len(n['macs']) < len(n['networks']):
+                n['macs'].append(str(free_mac))
+                used_macs.append(n['macs'][-1])
+                while str(free_mac) in used_macs:
+                    free_mac = free_mac.next_mac()
 
     @staticmethod
     def __min_power_of_2(n):
