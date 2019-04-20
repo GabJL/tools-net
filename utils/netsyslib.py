@@ -91,8 +91,8 @@ class NetSystem:
             raise NetSystemException(
                 f"The provided network {self.system_net} has a lower number of IPs than required {min_total_ips}")
 
+        free_ip = self.system_net.get_id()
         if d["configuration"]["type"] == "VLSM":
-            free_ip = self.system_net.get_id()
             for n in self.networks:
                 n['network'] = netlib.Network(free_ip, 32 - n["bits"])
                 next_ip = iplib.IPAddress(n["network"].get_broadcast())
@@ -102,6 +102,16 @@ class NetSystem:
             if self.system_net.get_netprefix() + min_nets + max_hosts > 32:
                 raise NetSystemException(
                     f"The number of available IPs doesnt allow to apply {d['configuration']['type']}. Try VLSM")
+            if d["configuration"]["type"] == 'MinNets':
+                prefix = self.system_net.get_netprefix() + min_nets
+            else:
+                prefix = 32 - max_hosts
+            for n in self.networks:
+                n['network'] = netlib.Network(free_ip, prefix)
+                next_ip = iplib.IPAddress(n["network"].get_broadcast())
+                next_ip = next_ip.from_number(next_ip.to_number()+1)
+                free_ip = str(next_ip)
+
 
     @staticmethod
     def __min_power_of_2(n):
