@@ -12,15 +12,34 @@ class Node:
         self.arp_table = []
         self.ip_table = []
 
-    def set_interface(self, name, ip, mac, net_name):
-        if name not in self.interfaces:
-            i = {'name': name, "ip": ip, "mac": mac, "net_name": net_name}
-            self.interfaces.append(i)
+    def new_interface(self):
+        pos = len(self.interfaces)
+        i = {'name': 'nic' + str(pos), "ip": None, "mac": None, "net": None}
+        self.interfaces.append(i)
+        return pos
 
-    def remove_interface(self, name):
-        for i in range(len(self.interfaces)):
-            if self.interfaces[i]["name"] == name:
-                del (self.interfaces[i])
+    def remove_interface(self, pos):
+        if len(self.interfaces) > pos:
+            del (self.interfaces[pos])
+
+    def get_interface(self, pos):
+        if len(self.interfaces) > pos:
+            return self.interfaces[pos]
+
+    def set_ip(self, pos, ip):
+        if len(self.interfaces) > pos:
+            self.interfaces[pos]['ip'] = ip
+
+    def set_mac(self, pos, mac):
+        if len(self.interfaces) > pos:
+            self.interfaces[pos]['mac'] = mac
+
+    def set_net(self, pos, net):
+        if len(self.interfaces) > pos:
+            self.interfaces[pos]['net'] = net
+
+    def get_number_of_interfaces(self):
+        return len(self.interfaces)
 
 
 class NetSystemException(Exception):
@@ -130,11 +149,16 @@ class NetSystem:
                         if __name__ == '__main__':
                             if n["network"].overlap(n1["network"]):
                                 raise NetSystemException(f"{n['name']} and {n1['name']} are overlapping nets.")
-        self.__assign_macs()
+        self.__create_interfaces()
+        if d['configuration']['type'] != 'Preconfigured':
+            self.__assign_ips()
 
-    def __assign_macs(self):
+    def __create_interfaces(self):
         used_macs = []
-        for n in self.nodes:
+        aux = self.nodes
+        self.nodes = []
+        for n in aux:
+            self.nodes.append(Node(n['name']))
             if n.get('macs', None):
                 used_macs += n['macs']
             else:
@@ -144,12 +168,31 @@ class NetSystem:
         while str(free_mac) in used_macs:
             free_mac = free_mac.next_mac()
 
-        for n in self.nodes:
+        for h, n in enumerate(aux):
             while len(n['macs']) < len(n['networks']):
                 n['macs'].append(str(free_mac))
                 used_macs.append(n['macs'][-1])
                 while str(free_mac) in used_macs:
                     free_mac = free_mac.next_mac()
+            for i in range(len(n['networks'])):
+                pos = self.nodes[h].new_interface()
+                self.nodes[h].set_mac(pos, maclib.MACAddress(n['macs'][i]))
+                for net in self.networks:
+                    if net['name'] == n['networks'][i]:
+                        self.nodes[h].set_net(pos, net)
+
+    def __assign_ips(self):
+        for h in self.nodes:
+            for p in range(h.get_number_of_interfaces()):
+                interface = h.get_interface(p)
+                if not interface['net'].get('first_ip_free', None):
+                    ip = iplib.IPAddress(interface['net']['network'].get_id())
+                    ip.from_number(ip.to_number()+1)
+                    interface['net']['first_ip_free'] = ip
+                interface['ip'] = iplib.IPAddress(str(interface['net']['first_ip_free']))
+                ip = interface['net']['first_ip_free']
+                ip.from_number(ip.to_number() + 1)
+                #interface['net']['first_ip_free'] = ip
 
     @staticmethod
     def __min_power_of_2(n):
@@ -159,3 +202,4 @@ class NetSystem:
             bits += 1
             pow *= 2
         return bits
+
