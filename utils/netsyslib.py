@@ -32,8 +32,8 @@ class NetSystem:
         try:
             with open(filename) as f:
                 data = json.load(f)
-        except Exception:
-            raise NetSystemException(f"There is a problem reading the configuration file {filename}")
+        except Exception as e:
+            raise NetSystemException(f"There is a problem reading the configuration file {filename}: {e}")
 
         self.__analyze_nets(data)
 
@@ -41,8 +41,11 @@ class NetSystem:
         if not d.get("configuration", None):
             raise NetSystemException("There is no configuration section in system description")
 
-        self.system_net = netlib.Network(d["configuration"].get("IP", None),
-                                         d["configuration"].get("mask", None))
+        try:
+            self.system_net = netlib.Network(d["configuration"].get("IP", None),
+                                             d["configuration"].get("mask", None))
+        except netlib.NetworkException as e:
+            raise NetSystemException(f"The provided network is not valid ({e})")
 
         if d["configuration"].get("type") not in ["VLSM", "MaxNets", "MinNets", "Preconfigured"]:
             raise NetSystemException(
@@ -64,25 +67,25 @@ class NetSystem:
         for h in d.get("named nodes",[]):
             if not d.get("networks", []):
                 raise NetSystemException(f"Node {h['name']} is not assigned to any network")
-            for n in h["netowrks"]:
+            for n in h["networks"]:
                 for n1 in self.networks:
                     if n == n1['name']:
                         if h['name'] in n1['related hosts']:
                             raise NetSystemException(f"Node {h['name']} is repeated in network {n1['name']}")
-                        n1["related host"].append(n)
+                        n1["related hosts"].append(h['name'])
                         n1["ips needed"] += 1
                         self.nodes.append(h)
                         break
                 else:
                     raise NetSystemException(f"Node {h['name']} is assigned to unknown network ({n})")
 
-        self.networks = sorted(self.networks, key=lambda k: k['ip needed'], reverse=True)
+        self.networks = sorted(self.networks, key=lambda k: k['ips needed'], reverse=True)
 
         min_nets = self.__min_power_of_2(len(self.networks))
         max_hosts = 0
         min_total_ips = 0
         for n in self.networks:
-            n["bits"] = self.__min_power_of_2(n["ip needed"])
+            n["bits"] = self.__min_power_of_2(n["ips needed"])
             min_total_ips += 2**n['bits']
             if n["bits"] > max_hosts:
                 max_hosts = n["bits"]
@@ -96,7 +99,7 @@ class NetSystem:
             for n in self.networks:
                 n['network'] = netlib.Network(free_ip, 32 - n["bits"])
                 next_ip = iplib.IPAddress(n["network"].get_broadcast())
-                next_ip = next_ip.from_number(next_ip.to_number()+1)
+                next_ip.from_number(next_ip.to_number()+1)
                 free_ip = str(next_ip)
         elif d["configuration"]["type"] != "Preconfigured":
             if self.system_net.get_netprefix() + min_nets + max_hosts > 32:
@@ -109,7 +112,7 @@ class NetSystem:
             for n in self.networks:
                 n['network'] = netlib.Network(free_ip, prefix)
                 next_ip = iplib.IPAddress(n["network"].get_broadcast())
-                next_ip = next_ip.from_number(next_ip.to_number()+1)
+                next_ip.from_number(next_ip.to_number()+1)
                 free_ip = str(next_ip)
         else: # preconfigured
             for n in self.networks:
