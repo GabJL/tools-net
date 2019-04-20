@@ -77,3 +77,37 @@ class NetSystem:
                     raise NetSystemException(f"Node {h['name']} is assigned to unknown network ({n})")
 
         self.networks = sorted(self.networks, key=lambda k: k['ip needed'], reverse=True)
+
+        min_nets = self.__min_power_of_2(len(self.networks))
+        max_hosts = 0
+        min_total_ips = 0
+        for n in self.networks:
+            n["bits"] = self.__min_power_of_2(n["ip needed"])
+            min_total_ips += 2**n['bits']
+            if n["bits"] > max_hosts:
+                max_hosts = n["bits"]
+
+        if min_total_ips > (self.system_net.get_number_of_hosts()+2):
+            raise NetSystemException(
+                f"The provided network {self.system_net} has a lower number of IPs than required {min_total_ips}")
+
+        if d["configuration"]["type"] == "VLSM":
+            free_ip = self.system_net.get_id()
+            for n in self.networks:
+                n['network'] = netlib.Network(free_ip, 32 - n["bits"])
+                next_ip = iplib.IPAddress(n["network"].get_broadcast())
+                next_ip = next_ip.from_number(next_ip.to_number()+1)
+                free_ip = str(next_ip)
+        elif d["configuration"]["type"] != "Preconfigured":
+            if self.system_net.get_netprefix() + min_nets + max_hosts > 32:
+                raise NetSystemException(
+                    f"The number of available IPs doesnt allow to apply {d['configuration']['type']}. Try VLSM")
+
+    @staticmethod
+    def __min_power_of_2(n):
+        bits = 1
+        pow = 2
+        while pow < n:
+            bits += 1
+            pow *= 2
+        return bits
