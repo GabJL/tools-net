@@ -2,27 +2,65 @@
   "configuration": {
     "IP": "192.168.0.0",
     "mask": "255.255.0.0",
-    "type": "MinNets"
+    "type": "MaxNets"
   },
   "networks": [
     {
-      "name": "LAN1",
-      "hosts": 100,
+      "name": "Lab 1",
+      "hosts": 40,
       "MTU": 1500
     },
     {
-      "name": "LAN2",
-      "hosts": 100,
+      "name": "Lab 2",
+      "hosts": 40,
+      "MTU": 1500
+    },
+    {
+      "name": "Library",
+      "hosts": 12,
+      "MTU": 1500
+    },
+    {
+      "name": "Research",
+      "hosts": 7,
+      "MTU": 1500
+    },
+    {
+      "name": "No Hosts",
+      "hosts": 0,
+      "MTU": 1500
+    },
+    {
+      "name": "Faculty A",
+      "hosts": 25,
+      "MTU": 1500
+    },
+    {
+      "name": "Faculty B",
+      "hosts": 25,
       "MTU": 1500
     }
   ],
-  "named nodes": [{
+  "named nodes": [
+    {
       "name": "R1",
-      "networks": ["LAN1", "LAN2"]
+      "networks": ["Library"]
     },
     {
-      "name": "A",
-      "networks": ["LAN1"]
+      "name": "R2",
+      "networks": ["Library", "Lab 1", "Lab 2"]
+    },
+    {
+      "name": "R3",
+      "networks": ["Research", "No Hosts", "Library"]
+    },
+     {
+      "name": "R4",
+      "networks": ["No Hosts", "Faculty B"]
+    },
+    {
+      "name": "R5",
+      "networks": ["No Hosts", "Faculty A"]
     }
   ]
 }
