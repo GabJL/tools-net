@@ -111,7 +111,19 @@ class NetSystem:
                 next_ip = iplib.IPAddress(n["network"].get_broadcast())
                 next_ip = next_ip.from_number(next_ip.to_number()+1)
                 free_ip = str(next_ip)
-
+        else: # preconfigured
+            for n in self.networks:
+                try:
+                    n["network"] = netlib.Network(n["netid"], n["netmask"])
+                    if not self.system_net.is_in(n["network"]):
+                        raise NetSystemException(f"Net {n['name']} is not inside of {self.system_net}")
+                except Exception:
+                    raise NetSystemException(f"Configuration of net {n['name']} is not correct.")
+                for n1 in self.networks:
+                    if n["name"] != n1["name"]:
+                        if __name__ == '__main__':
+                            if n["network"].overlap(n1["network"]):
+                                raise NetSystemException(f"{n['name']} and {n1['name']} are overlapping nets.")
 
     @staticmethod
     def __min_power_of_2(n):
