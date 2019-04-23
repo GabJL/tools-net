@@ -97,3 +97,6 @@ class Network():
         last2 = iplib.IPAddress(other.get_broadcast())
 
         return first2 >= first1 and last2 <= last1
+
+    def __eq__(self, other):
+        return self.netid == other.netid and self.netmask == other.netmask

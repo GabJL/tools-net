@@ -10,8 +10,8 @@ class Node:
         self.name = name
         self.border = False
         self.interfaces = []
-        self.arp_table = []
-        self.ip_table = []
+        self.arp_table = {}
+        self.ip_table = {}
 
     def set_as_border(self):
         self.border = True
@@ -57,6 +57,11 @@ class Node:
             description += f"\tThis node allows to connect to Internet\n"
         return description
 
+    def add_to_arp_table(self, ip, mac):
+        self.arp_table[ip] = mac
+
+    def create_ip_table(self, nets):
+        pass
 
 class NetSystemException(Exception):
     pass
@@ -243,3 +248,11 @@ class NetSystem:
         for n in self.nodes:
             description += str(n)
         return description
+
+
+if __name__ == '__main__':
+    try:
+        net = NetSystem('../tools/samples/networks.json')
+    except NetSystemException as e:
+        print(e)
+    print(net)
