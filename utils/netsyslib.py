@@ -67,16 +67,19 @@ class Node:
     def get_arp_table(self):
         return self.arp_table
 
-    def get_next_step(self, net):
-        if net not in self.ip_table:
+    def get_next_step(self, ip):
+        for network, values in self.ip_table.items():
+            if network.is_in(netlib.Network(ip,32)):
+                return values['next step']
+        else:
             raise NetSystemException('No route to net')
 
-        return self.ip_table[net]
-
-    def get_routing_cost(self, net):
-        if net not in self.ip_table:
+    def get_routing_cost(self, ip):
+        for network, values in self.ip_table.items():
+            if network.is_in(netlib.Network(ip, 32)):
+                return values['next step']
+        else:
             return self.MAX_ROUTING_COST
-        return self.ip_table[net]
 
     def create_ip_table(self, nets):
         self.ip_table = {}
