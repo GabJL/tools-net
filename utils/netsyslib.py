@@ -6,6 +6,7 @@ import json
 
 
 class Node:
+    MAX_ROUTING_COST = 15
     def __init__(self, name):
         self.name = name
         self.border = False
@@ -67,7 +68,12 @@ class Node:
         return self.arp_table
 
     def create_ip_table(self, nets):
-        pass
+        self.ip_table = {}
+        for n in nets:
+            self.ip_table[n] = {'next step': None, 'cost': self.MAX_ROUTING_COST}
+            if any(x['net'] == n for x in self.interfaces):
+                self.ip_table[n] = {'cost': 1}
+
 
 class NetSystemException(Exception):
     pass
