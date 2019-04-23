@@ -60,6 +60,9 @@ class Node:
     def add_to_arp_table(self, ip, mac):
         self.arp_table[ip] = mac
 
+    def query_arp_table(self, ip):
+        return self.arp_table.get(ip)
+
     def create_ip_table(self, nets):
         pass
 
